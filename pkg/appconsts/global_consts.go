@@ -60,7 +60,7 @@ const (
 
 	// ContinuationSparseShareContentSize is the number of bytes usable for data
 	// in a continuation sparse share of a sequence.
-	ContinuationSparseShareContentSize = ShareSize - NamespaceSize - ShareInfoBytes
+	ContinuationSparseShareContentSize = ShareSize - NamespaceSize - ShareInfoBytes // 512-29-1 = 482
 
 	// MinSquareSize is the smallest original square width.
 	MinSquareSize = 1

@@ -26,17 +26,25 @@ func Build(txs [][]byte, appVersion uint64, maxSquareSize int) (Square, [][]byte
 	}
 	normalTxs := make([][]byte, 0, len(txs))
 	blobTxs := make([][]byte, 0, len(txs))
+
+	totalBlobSize := 0
+	totalNormalSize := 0
 	for _, tx := range txs {
 		blobTx, isBlobTx := core.UnmarshalBlobTx(tx)
 		if isBlobTx {
 			if builder.AppendBlobTx(blobTx) {
 				blobTxs = append(blobTxs, tx)
+				totalBlobSize += len(tx)
 			}
 		} else {
 			if builder.AppendTx(tx) {
 				normalTxs = append(normalTxs, tx)
+				totalNormalSize += len(tx)
 			}
 		}
+	}
+	if len(txs) > 0 {
+		fmt.Printf("totalSize of the block\n\tnormal: %d\n\tblob: %d\n", totalNormalSize, totalBlobSize)
 	}
 	square, err := builder.Export()
 	return square, append(normalTxs, blobTxs...), err

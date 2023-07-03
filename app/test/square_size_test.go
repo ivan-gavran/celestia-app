@@ -72,31 +72,34 @@ func (s *SquareSizeIntegrationTest) TestSquareSizeUpperBound_Flaky() {
 	tests := []test{
 		{
 			name:                  "default",
-			govMaxSquareSize:      appconsts.DefaultGovMaxSquareSize,
-			maxBytes:              appconsts.DefaultMaxBytes,
-			expectedMaxSquareSize: appconsts.DefaultGovMaxSquareSize,
+			govMaxSquareSize:      appconsts.DefaultGovMaxSquareSize, // 64
+			maxBytes:              appconsts.DefaultMaxBytes,         // 1 974 272
+			expectedMaxSquareSize: appconsts.DefaultGovMaxSquareSize, // 64
 			pfbsPerBlock:          20,
 		},
 		{
+			// why does max bytes constrain square size here? (all but pfbsPerBlock is the same as in the default case)
 			name:                  "max bytes constrains square size",
-			govMaxSquareSize:      appconsts.DefaultGovMaxSquareSize,
-			maxBytes:              appconsts.DefaultMaxBytes,
-			expectedMaxSquareSize: appconsts.DefaultGovMaxSquareSize,
+			govMaxSquareSize:      appconsts.DefaultGovMaxSquareSize, // 64
+			maxBytes:              appconsts.DefaultMaxBytes,         // 1 974 272
+			expectedMaxSquareSize: appconsts.DefaultGovMaxSquareSize, // 64
 			pfbsPerBlock:          40,
 		},
 		{
 			name:                  "gov square size == hardcoded max",
-			govMaxSquareSize:      appconsts.DefaultSquareSizeUpperBound,
-			maxBytes:              appconsts.DefaultSquareSizeUpperBound * appconsts.DefaultSquareSizeUpperBound * appconsts.ContinuationSparseShareContentSize,
-			expectedMaxSquareSize: appconsts.DefaultSquareSizeUpperBound,
+			govMaxSquareSize:      appconsts.DefaultSquareSizeUpperBound,                                                                                        // 128
+			maxBytes:              appconsts.DefaultSquareSizeUpperBound * appconsts.DefaultSquareSizeUpperBound * appconsts.ContinuationSparseShareContentSize, // 7 897 088
+			expectedMaxSquareSize: appconsts.DefaultSquareSizeUpperBound,                                                                                        // 128
 			pfbsPerBlock:          40,
 		},
 	}
 
 	for _, tt := range tests {
+		fmt.Printf("Test Params:\n\tgovMaxSquareSize: %d\n\tmaxBytes: %d\n\texpectedMaxSquareSize: %d\n\tpfbsPerBlock: %d\n", tt.govMaxSquareSize, tt.maxBytes, tt.expectedMaxSquareSize, tt.pfbsPerBlock)
 		t.Run(tt.name, func(t *testing.T) {
 			s.setBlockSizeParams(t, tt.govMaxSquareSize, tt.maxBytes)
 			start, end := s.fillBlocks(100_000, 100, tt.pfbsPerBlock, 20*time.Second)
+			fmt.Printf("start: %d, end: %d\n", start, end)
 
 			// check that we're not going above the specified size and that we hit the specified size
 			actualMaxSize := 0
@@ -104,12 +107,14 @@ func (s *SquareSizeIntegrationTest) TestSquareSizeUpperBound_Flaky() {
 				block, err := s.cctx.Client.Block(s.cctx.GoContext(), &i)
 				require.NoError(t, err)
 				require.LessOrEqual(t, block.Block.Data.SquareSize, uint64(tt.govMaxSquareSize))
-
+				fmt.Printf("at block %d, square size is %d\n", block.Block.Height, block.Block.Data.SquareSize)
 				if block.Block.Data.SquareSize > uint64(actualMaxSize) {
+
 					actualMaxSize = int(block.Block.Data.SquareSize)
 				}
 			}
 			require.Greater(t, tt.expectedMaxSquareSize, actualMaxSize)
+			t.Logf("max square size: %d, expected size: %d\n", actualMaxSize, tt.expectedMaxSquareSize)
 		})
 	}
 }

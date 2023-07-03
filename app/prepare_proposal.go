@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/celestiaorg/celestia-app/pkg/da"
 	"github.com/celestiaorg/celestia-app/pkg/shares"
 	"github.com/celestiaorg/celestia-app/pkg/square"
@@ -39,6 +41,16 @@ func (app *App) PrepareProposal(req abci.RequestPrepareProposal) abci.ResponsePr
 	dataSquare, txs, err := square.Build(txs, app.GetBaseApp().AppVersion(), app.GovSquareSizeUpperBound(sdkCtx))
 	if err != nil {
 		panic(err)
+	}
+
+	numTxs := len(txs)
+	if numTxs > 0 {
+		totalSize := 0
+		for _, tx := range txs {
+			totalSize += len(tx)
+		}
+		fmt.Printf("proposal block %d created with %d txs and %d bytes\n\n", sdkCtx.BlockHeight(), numTxs, totalSize)
+
 	}
 
 	// erasure the data square which we use to create the data root.

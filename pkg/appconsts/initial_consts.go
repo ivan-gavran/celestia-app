@@ -11,7 +11,7 @@ const (
 
 	// DefaultMaxBytes is the default value for the governance modifiable
 	// maximum number of bytes allowed in a valid block.
-	DefaultMaxBytes = DefaultGovMaxSquareSize * DefaultGovMaxSquareSize * ContinuationSparseShareContentSize
+	DefaultMaxBytes = DefaultGovMaxSquareSize * DefaultGovMaxSquareSize * ContinuationSparseShareContentSize // 64*64*482 = 1 974 272
 
 	// DefaultGasPerBlobByte is the default gas cost deducted per byte of blob
 	// included in a PayForBlobs txn
