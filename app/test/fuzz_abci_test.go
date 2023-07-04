@@ -112,14 +112,17 @@ func TestPrepareProposalConsistency(t *testing.T) {
 						"",
 					)
 					txs = append(txs, sendTxs...)
-					resp := testApp.PrepareProposal(abci.RequestPrepareProposal{
+					txsReq := coretypes.Txs(txs).ToSliceOfBytes()
+					prepareProposalArg := abci.RequestPrepareProposal{
 						BlockData: &core.Data{
-							Txs: coretypes.Txs(txs).ToSliceOfBytes(),
+							Txs: txsReq,
 						},
-					})
+					}
+					resp := testApp.PrepareProposal(prepareProposalArg)
 
 					// check that the square size is smaller than or equal to
 					// the specified size
+					t.Logf("size %s, test %s:\n\tblock square size = %d\tmax square size = %d\n\n", size.name, tt.name, resp.BlockData.SquareSize, size.govMaxSquareSize)
 					require.LessOrEqual(t, resp.BlockData.SquareSize, uint64(size.govMaxSquareSize))
 
 					res := testApp.ProcessProposal(abci.RequestProcessProposal{

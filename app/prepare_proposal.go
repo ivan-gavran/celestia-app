@@ -44,6 +44,7 @@ func (app *App) PrepareProposal(req abci.RequestPrepareProposal) abci.ResponsePr
 	}
 
 	numTxs := len(txs)
+	fmt.Printf("proposal block %d created with %d txs\n", sdkCtx.BlockHeight(), numTxs)
 	if numTxs > 0 {
 		totalSize := 0
 		for _, tx := range txs {
