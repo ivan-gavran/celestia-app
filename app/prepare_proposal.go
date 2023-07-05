@@ -34,9 +34,7 @@ func (app *App) PrepareProposal(req abci.RequestPrepareProposal) abci.ResponsePr
 		ante.DefaultSigVerificationGasConsumer,
 		app.IBCKeeper,
 	)
-	fmt.Printf("num txs before filtering: %d\n", len(req.BlockData.Txs))
 	txs := filterTxs(sdkCtx, handler, app.txConfig, req.BlockData.Txs)
-	fmt.Printf("num txs after filtering: %d\n", len(txs))
 
 	// build the square from the set of valid and prioritised transactions.
 	// The txs returned are the ones used in the square and block

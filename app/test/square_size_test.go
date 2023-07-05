@@ -107,7 +107,6 @@ func (s *SquareSizeIntegrationTest) TestSquareSizeUpperBound_Flaky() {
 				block, err := s.cctx.Client.Block(s.cctx.GoContext(), &i)
 				require.NoError(t, err)
 				require.LessOrEqual(t, block.Block.Data.SquareSize, uint64(tt.govMaxSquareSize))
-				fmt.Printf("at block %d, square size is %d\n", block.Block.Height, block.Block.Data.SquareSize)
 				if block.Block.Data.SquareSize > uint64(actualMaxSize) {
 
 					actualMaxSize = int(block.Block.Data.SquareSize)
